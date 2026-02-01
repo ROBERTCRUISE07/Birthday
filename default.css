@@ -1,0 +1,165 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000; /* fallback color */
+  background-image: url('20250408_181018.jpg');
+  /* Fill the viewport and crop as needed so the image covers the whole background */
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  /* Allow background to scroll with the page content */
+  background-attachment: scroll;
+  min-height: 100vh;
+  color: white;
+  font-size: 14px;
+  font-family: sans-serif;
+  /* Prevent horizontal scrolling while allowing vertical scroll */
+  overflow-x: hidden;
+  overflow-y: auto;
+} 
+a {
+  color: white;
+  font-size: 14px;
+}
+#main {
+  width: 100%;
+}
+#wrap {
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1100px;
+  min-height: 680px;
+  margin-top: 10px;
+  padding-bottom: 60px; /* ensure some space for scrolling */
+} 
+#text {
+  width: 272px;
+  height: 560px;
+  left: 148px;
+  top: 80px;
+  position: absolute;
+}
+#code {
+  display: none;
+  color: #FFC0CB; /* changed from cyan to pink */
+  font-size: 16px;
+  margin-top: 70px;
+  line-height: 25px;
+  font-size: larger;
+  font-weight: bolder;
+}
+.pink {
+  color: #FFC0CB;
+  font-weight: bolder;
+} 
+#clock-box {
+  position: absolute;
+  left: 60px;
+  top: 550px;
+  font-size: 28px;
+  display: none;
+}
+#clock-box a {
+  font-size: 28px;
+  text-decoration: none;
+}
+#clock {
+  margin-left: 48px;
+}
+#clock .digit {
+  font-size: 64px;
+}
+#canvas {
+  margin: 0 auto;
+  width: 100%;
+  height: auto;
+  min-height: 680px;
+  display: block;
+  /* no horizontal offset — canvas centered */
+  transform: translateX(0);
+}
+#error {
+  margin: 0 auto;
+  text-align: center;
+  margin-top: 60px;
+  display: none;
+}
+.hand {
+  cursor: pointer;
+}
+.say {
+  margin-left: 5px;
+}
+.space {
+  margin-right: 150px;
+}
+
+#message-box{
+  position: absolute;
+  margin-top:450px;
+  font-size: 25px;
+  font-family: monospace;
+
+}
+
+/* Fixed white footer bar positioned under the tree (non-interactive) */
+#fixed-footer {
+  background: transparent; /* base container transparent; rays are visible */
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* horizontal ray elements that animate outward from center */
+.ray {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: #FFF;
+  opacity: 0.95;
+  width: 0;
+  transition: width 320ms cubic-bezier(.2,.9,.2,1), opacity 220ms ease;
+  pointer-events: none;
+}
+.ray.left {
+  transform-origin: right center;
+  right: 50%;
+}
+.ray.right {
+  transform-origin: left center;
+  left: 50%;
+}
+
+/* Balloons that float from bottom to top */
+.balloon {
+  position: fixed;
+  bottom: -120px;
+  width: 48px;
+  height: 64px;
+  border-radius: 50% 50% 45% 45%;
+  background: #ff6b6b;
+  box-shadow: inset -6px -8px rgba(0,0,0,0.08), 0 6px 20px rgba(0,0,0,0.15);
+  opacity: 0.98;
+  transform-origin: center bottom;
+  pointer-events: none;
+  z-index: 10000;
+  animation-fill-mode: forwards;
+}
+.balloon:after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  width: 2px;
+  height: 18px;
+  background: rgba(0,0,0,0.12);
+  transform: translateX(-50%);
+  border-radius: 1px;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  60% { opacity: 1; }
+  100% { transform: translateY(-130vh) scale(0.98); opacity: 0; }
+}
