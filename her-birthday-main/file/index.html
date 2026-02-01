@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>HBD love</title>	    
+    <link type="text/css" rel="stylesheet" href="default.css">
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="jscex.min.js"></script>
+    <script type="text/javascript" src="jscex-parser.js"></script>
+    <script type="text/javascript" src="jscex-jit.js"></script>
+    <script type="text/javascript" src="jscex-builderbase.min.js"></script>
+    <script type="text/javascript" src="jscex-async.min.js"></script>
+    <script type="text/javascript" src="jscex-async-powerpack.min.js"></script>
+    <script type="text/javascript" src="function.js" charset="utf-8"></script>
+    <script type="text/javascript" src="love.js" charset="utf-8"></script>
+    <script>
+        function playAudio() {
+            var audio = document.getElementById("myAudio");
+            audio.play();
+        }
+    </script>
+</head>
+<body>
+    <div id="main">
+        <div id="error"><a href="http://www.google.cn/chrome/intl/zh-CN/landing_chrome.html?hl=zh-CN&brand=CHMI">Chrome</a> (<a href="http://firefox.com.cn/download/">Firefox</a>)</div>
+        <audio autoplay="autoplay" height="100" width="100" id="myAudio">
+            <source src="aud.mp3" type="audio/mp3" />
+            <embed height="100" width="100" src="aud.mp3" />
+        </audio>
+        <div id="wrap">
+            <div id="text">
+                <div id="code">
+                    <span class="say">Hey Dhruti 💞💫</span><br>
+                    <span class="say">Happy Birthday 🎈🥳🤩🎂🎉🎊🎁</span><br>
+                    <span class="say">May God bless you 🍀</span><br>
+                    <span class="say">And give u many happiness in your life 💕</span><br>
+                    <span class="say">Just saying... you're pretty awesome ❤️</span><br>
+                    <span class="say">Sending good vibes and maybe a wink 😏</span><br>
+                    <span class="say">Hope u have a great day today ❤️🥰</span><br>
+                </div>
+            </div>
+            <canvas id="canvas" width="1100" height="680"></canvas>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        var canvas = $('#canvas');
+		
+        if (!canvas[0].getContext) {
+            $("#error").show();
+            return false;
+        }
+
+        // ensure canvas visible and clear any previous parent background
+        canvas.show();
+        canvas.parent().css('background', 'none');
+
+        var width = canvas.width();
+        // Keep original aspect ratio (1100x680) so canvas scales responsively
+        var aspectHeight = Math.round(width * 680 / 1100);
+        // Ensure canvas is taller than viewport so page can scroll (min 120% of viewport height)
+        var minScrollHeight = Math.round(window.innerHeight * 1.2);
+        var height = Math.max(aspectHeight, minScrollHeight, 680);
+        canvas.css('height', height + 'px');
+        canvas.attr("width", width);
+        canvas.attr("height", height);
+
+        // Recalculate on window resize (debounced) and reload to reinitialize animation at new size
+        (function(){
+            var resizeTimeout;
+            $(window).on('resize', function(){
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function(){
+                    location.reload();
+                }, 250);
+            });
+        })();
+
+        var opts = {
+            seed: {
+                x: width / 2 - 80,
+                color: "rgb(190, 26, 37)",
+                scale: 2
+            },
+            branch: [
+                [535, 680, 570, 250, 500, 200, 30, 100, [
+                    [540, 500, 455, 417, 340, 400, 13, 100, [
+                        [450, 435, 434, 430, 394, 395, 2, 40]
+                    ]],
+                    [550, 445, 600, 356, 680, 345, 12, 100, [
+                        [578, 400, 648, 409, 661, 426, 3, 80]
+                    ]],
+                    [539, 281, 537, 248, 534, 217, 3, 40],
+                    [546, 397, 413, 247, 328, 244, 9, 80, [
+                        [427, 286, 383, 253, 371, 205, 2, 40],
+                        [498, 345, 435, 315, 395, 330, 4, 60]
+                    ]],
+                    [546, 357, 608, 252, 678, 221, 6, 100, [
+                        [590, 293, 646, 277, 648, 271, 2, 80]
+                    ]]
+                ]] 
+            ],
+            bloom: {
+                num: 700,
+                width: 1080,
+                height: 650,
+            },
+            footer: {
+                width: 1200,
+                height: 5,
+                speed: 10,
+            }
+        }
+
+        var tree = new Tree(canvas[0], width, height, opts);
+        var seed = tree.seed;
+        var foot = tree.footer;
+        var hold = 1;
+
+        // Create a fixed HTML footer bar positioned below the tree (no pointer events)
+        var $fixedFooter = $('<div id="fixed-footer"></div>').appendTo('body');
+
+        // Prevent canvas footer from drawing so we only show the fixed bar
+        if (foot && typeof foot.draw === 'function') {
+            foot.draw = function(){};
+        }
+
+        function positionFixedFooter() {
+            var footerWidth = (opts.footer && opts.footer.width) || 1200;
+            var footerHeight = (opts.footer && opts.footer.height) || 5;
+            var canvasOffset = canvas.offset();
+            var viewportLeft, viewportTop;
+            if (tree && tree.record && tree.record['p1']) {
+                var rec = tree.record['p1'];
+                // seed X offset inside the snapshot (snapshot source x is 240)
+                var seedXInCanvas = (seed && seed.heart && seed.heart.point) ? seed.heart.point.x : (canvas.width() / 2);
+                var seedViewportX = canvasOffset.left - $(window).scrollLeft() + rec.point.x + (seedXInCanvas - 240);
+                viewportLeft = seedViewportX - footerWidth / 2;
+                // position just below the bottom of the snapshot area
+                var snapshotBottom = canvasOffset.top - $(window).scrollTop() + rec.point.y + 680;
+                viewportTop = snapshotBottom - (footerHeight / 2) + 10;
+            } else {
+                var seedX = seed && seed.heart && seed.heart.point ? seed.heart.point.x : (canvas.width() / 2);
+                viewportLeft = canvasOffset.left - $(window).scrollLeft() + seedX - footerWidth / 2;
+                viewportTop = canvasOffset.top - $(window).scrollTop() + canvas.height() - (footerHeight / 2) + 10; // 10px below canvas bottom
+            }
+            $fixedFooter.css({
+                position: 'fixed',
+                left: viewportLeft + 'px',
+                top: viewportTop + 'px',
+                width: footerWidth + 'px',
+                height: footerHeight + 'px'
+            });
+        }
+
+        // Initial position and update on scroll/resize
+        positionFixedFooter();
+        $(window).on('resize scroll', positionFixedFooter);
+
+        canvas.click(function(e) {
+            playAudio();
+            var offset = canvas.offset(), x, y;
+            x = e.pageX - offset.left;
+            y = e.pageY - offset.top;
+            if (seed.hover(x, y)) {
+                hold = 0; 
+                canvas.unbind("click");
+                canvas.unbind("mousemove");
+                canvas.removeClass('hand');
+            }
+        }).mousemove(function(e) {
+            var offset = canvas.offset(), x, y;
+            x = e.pageX - offset.left;
+            y = e.pageY - offset.top;
+            canvas.toggleClass('hand', seed.hover(x, y));
+        });
+
+        var seedAnimate = eval(Jscex.compile("async", function () {
+            seed.draw();
+            while (hold) {
+                $await(Jscex.Async.sleep(10));
+            }
+            while (seed.canScale()) {
+                seed.scale(0.95);
+                $await(Jscex.Async.sleep(10));
+            }
+            while (seed.canMove()) {
+                seed.move(0, 2);
+                foot.draw();
+                $await(Jscex.Async.sleep(10));
+            }
+        }));
+
+        var growAnimate = eval(Jscex.compile("async", function () {
+            do {
+                tree.grow();
+                $await(Jscex.Async.sleep(10));
+            } while (tree.canGrow());
+        }));
+
+        var flowAnimate = eval(Jscex.compile("async", function () {
+            do {
+                tree.flower(2);
+                $await(Jscex.Async.sleep(10));
+            } while (tree.canFlower());
+        }));
+
+        // Emit balloons that float upward from under the tree
+        function emitBalloons(count) {
+            var colors = ['#ff6b6b', '#f7b32b', '#69c9a0', '#7b7cfb', '#ff9fb1', '#ff7b5a'];
+            var canvasOffset = canvas.offset();
+            var seedX = seed && seed.heart && seed.heart.point ? seed.heart.point.x : (canvas.width() / 2);
+            var baseLeft = canvasOffset.left - $(window).scrollLeft() + seedX;
+            for (var i = 0; i < count; i++) {
+                (function(i) {
+                    var size = Math.floor(Math.random() * 40) + 36; // 36-76px
+                    var left = baseLeft + Math.floor(Math.random() * 240) - 120 - size / 2;
+                    var color = colors[Math.floor(Math.random() * colors.length)];
+                    var dur = (Math.random() * 3) + 4; // 4-7s
+                    var b = $('<div class="balloon"></div>').appendTo('body');
+                    b.css({left: left + 'px', width: size + 'px', height: Math.round(size * 1.2) + 'px', background: color, 'animation': 'floatUp ' + dur + 's ease-out forwards'});
+                    // slight horizontal drift via CSS translate over time
+                    var drift = (Math.random() - 0.5) * 160;
+                    b.css('transform', 'translateX(' + drift + 'px)');
+                    setTimeout(function() { b.css('transform', 'translateX(' + (drift * 0.25) + 'px)'); }, 250);
+                    b.on('animationend webkitAnimationEnd', function() { b.remove(); });
+                })(i);
+            }
+        }
+
+        var moveAnimate = eval(Jscex.compile("async", function () {
+            // The snapshot-based move only shifts part of the drawing and leaves
+            // previously rendered content behind. Instead, animate the whole
+            // canvas element using CSS transforms so it won't cause horizontal scroll.
+            canvas.css({position: 'relative', transform: 'translateX(0px)'});
+            var target = 500; // final translateX offset in pixels
+            var step = 8; // pixels per frame
+            var cur = 0;
+
+            // emit a larger balloon burst now for a more celebratory effect
+            emitBalloons(20);
+
+            while (cur < target) {
+                cur += step;
+                canvas.css('transform', 'translateX(' + cur + 'px)');
+                // more frequent, slightly larger balloon bursts while moving
+                if (cur % 80 === 0) {
+                    emitBalloons(2);
+                }
+                $await(Jscex.Async.sleep(10));
+            }
+
+            // Optional: take a snapshot after movement if you want to store the final state
+            // tree.snapshot("p2", 500, 0, 610, 680);
+        }));
+
+        var textAnimate = eval(Jscex.compile("async", function () {
+            $("#code").show().typewriter();
+        }));
+	    
+        var runAsync = eval(Jscex.compile("async", function () {
+            $await(seedAnimate());
+            $await(growAnimate());
+            $await(flowAnimate());
+            // big celebratory balloon burst after flowers appear
+            emitBalloons(36);
+            $await(moveAnimate());
+            textAnimate().start();
+        }));
+
+        runAsync().start();
+    })();
+    </script>
+</body>
+</html>
