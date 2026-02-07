@@ -169,14 +169,14 @@
             ctx.scale(0.75, 0.75);
             ctx.font = "12px,Verdana"; // 字号肿么没有用? (ˉ(∞)ˉ)
             ctx.fillText("Click Me:) ", 30, -5);
-            ctx.fillText("Birthday Queen !", 28, 10);
+            ctx.fillText("Happy 22nd Birthday, Queen !", 28, 10);
             ctx.restore();
         },
         clear: function() {
             var ctx = this.tree.ctx, cirle = this.cirle;
             var point = cirle.point, scale = cirle.scale, radius = 26;
             var w = h = (radius * scale);
-            ctx.clearRect(point.x - w, point.y - h, 4 * w, 4 * h);
+            ctx.clearRect(point.x - w, point.y - h, 10 * w, 10 * h);
         },
         hover: function(x, y) {
             var ctx = this.tree.ctx;
@@ -702,14 +702,14 @@
             ctx.scale(0.75, 0.75);
             ctx.font = "12px,Verdana"; // 字号肿么没有用? (ˉ(∞)ˉ)
             ctx.fillText("Click Me:) ", 30, -5);
-            ctx.fillText("Birthday Queen !", 28, 10);
+            ctx.fillText("Happy 22nd Birthday, Queen !", 28, 10);
             ctx.restore();
         },
         clear: function() {
             var ctx = this.tree.ctx, cirle = this.cirle;
             var point = cirle.point, scale = cirle.scale, radius = 26;
             var w = h = (radius * scale);
-            ctx.clearRect(point.x - w, point.y - h, 4 * w, 4 * h);
+            ctx.clearRect(point.x - w, point.y - h, 10 * w, 10 * h);
         },
         hover: function(x, y) {
             var ctx = this.tree.ctx;
@@ -1062,5 +1062,6 @@
     window.bezier = bezier;
     window.Point = Point;
     window.Tree = Tree;
+
 
 })(window);
